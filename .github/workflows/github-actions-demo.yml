@@ -10,4 +10,6 @@ jobs:
         python-version: '3.12'
     - run: python --version
     - run: uname -a
+    - run: pip install --upgrade pip
+    - run: pip install -U pytest
     - run: pytest
