@@ -4,16 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LD50 degli Ingredienti</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&display=swap">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <h1>LD50 degli Ingredienti</h1>
-        <select id="ingredient-select">
-            <option value="">Seleziona un ingrediente</option>
-        </select>
-        <button onclick="fetchLD50()">Ottieni LD50</button>
-        <div class="result-container" id="result-container"></div>
+        <div class="content">
+            <div class="left-panel">
+                <div class="selector-container">
+                    <label for="ingredient-select">Seleziona un ingrediente</label>
+                    <select id="ingredient-select">
+                        <option value="">Scegli un ingrediente</option>
+                    </select>
+                    <button onclick="fetchData()">Ottieni Informazioni</button>
+                </div>
+                <div class="image-container" id="image-container">
+                    <!-- L'immagine della struttura verrà inserita qui -->
+                </div>
+            </div>
+            <div class="right-panel">
+                <div class="result-container" id="result-container">
+                    <!-- I valori LD50 verranno inseriti qui -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -36,14 +51,14 @@
                 });
         });
 
-        function fetchLD50() {
+        function fetchData() {
             const ingredientName = document.getElementById("ingredient-select").value;
             if (!ingredientName) {
                 alert("Per favore, seleziona un ingrediente.");
                 return;
             }
 
-            fetch(`http://127.0.0.1:7071/api/get_ld50?ingredient_name=${encodeURIComponent(ingredientName)}`)
+            fetch(`http://127.0.0.1:7071/api/get_ld50_and_image?ingredient_name=${encodeURIComponent(ingredientName)}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
@@ -51,13 +66,27 @@
                     return response.json();
                 })
                 .then(data => {
+                    // Visualizza l'immagine
+                    const imageContainer = document.getElementById("image-container");
+                    imageContainer.innerHTML = `<h2>Struttura di ${data.ingredient}:</h2>`;
+                    imageContainer.innerHTML += `<img src="${data.image_url}" alt="Struttura chimica di ${data.ingredient}" />`;
+
+                    // Visualizza i valori LD50 in schede
                     const container = document.getElementById("result-container");
-                    container.innerHTML = `<h2>Ingrediente: ${data.ingredient}</h2>`;
-                    container.innerHTML += "<h3>Valori LD50:</h3><ul>";
-                    data.ld50_values.forEach(value => {
-                        container.innerHTML += `<li>${value}</li>`;
-                    });
-                    container.innerHTML += "</ul>";
+                    container.innerHTML = `<h2>Valori LD50 per ${data.ingredient}:</h2>`;
+                    if (data.ld50_values.length > 0) {
+                        container.innerHTML += "<div class='ld50-cards'>";
+                        data.ld50_values.forEach(value => {
+                            container.innerHTML += `
+                                <div class="ld50-card">
+                                    <p>${value}</p>
+                                </div>
+                            `;
+                        });
+                        container.innerHTML += "</div>";
+                    } else {
+                        container.innerHTML += "<p>Nessun valore LD50 trovato.</p>";
+                    }
                 })
                 .catch(error => {
                     console.error("Errore nel recupero dei dati:", error);

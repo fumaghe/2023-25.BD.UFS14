@@ -45,9 +45,15 @@ def get_ld50_pubchem(session, cid):
         logging.error(f"Error retrieving LD50 from PubChem for CID {cid}: {e}")
         return None
 
-@app.route(route="get_ld50", auth_level=func.AuthLevel.ANONYMOUS)
-def get_ld50(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Processing HTTP request for LD50 values of an ingredient.')
+# Function to get the image URL of the chemical structure
+def get_structure_image_url(cid):
+    # PubChem provides images via a specific URL pattern
+    image_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/CID/{cid}/PNG"
+    return image_url
+
+@app.route(route="get_ld50_and_image", auth_level=func.AuthLevel.ANONYMOUS)
+def get_ld50_and_image(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Processing HTTP request for LD50 values and structure image of an ingredient.')
 
     ingredient_name = req.params.get('ingredient_name')
 
@@ -63,18 +69,18 @@ def get_ld50(req: func.HttpRequest) -> func.HttpResponse:
         if cid:
             # Get the LD50 values using the CID
             ld50_values = get_ld50_pubchem(session, cid)
-            if ld50_values:
-                # Return the LD50 values as a JSON response
-                return func.HttpResponse(
-                    json.dumps({'ingredient': ingredient_name, 'ld50_values': ld50_values}),
-                    mimetype="application/json",
-                    status_code=200
-                )
-            else:
-                return func.HttpResponse(
-                    f"LD50 values not found for '{ingredient_name}'.",
-                    status_code=404
-                )
+            # Get the image URL
+            image_url = get_structure_image_url(cid)
+            # Return the data as a JSON response
+            return func.HttpResponse(
+                json.dumps({
+                    'ingredient': ingredient_name,
+                    'ld50_values': ld50_values or [],
+                    'image_url': image_url
+                }),
+                mimetype="application/json",
+                status_code=200
+            )
         else:
             return func.HttpResponse(
                 f"CID not found for '{ingredient_name}'.",

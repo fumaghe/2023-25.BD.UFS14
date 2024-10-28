@@ -1,3 +1,4 @@
+/* Impostazione di base */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -5,97 +6,147 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'League Spartan', sans-serif;
+    background-color: #1a202c;
+    color: #f1f1f1;
     display: flex;
-    align-items: center;
     justify-content: center;
-    height: 100vh;
-    background-color: #f0f2f5;
-    color: #333;
+    padding: 40px;
 }
 
 .container {
-    text-align: center;
-    padding: 30px;
-    background-color: #ffffff;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background-color: #121823;
+    padding: 40px;
+    max-width: 1100px;
+    width: 100%;
     border-radius: 12px;
-    max-width: 600px;
-    width: 90%;
-    transition: transform 0.3s ease;
-}
-
-.container:hover {
-    transform: scale(1.02);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
 h1 {
-    color: #2d3436;
-    margin-bottom: 20px;
-    font-size: 28px;
+    color: #ffffff;
+    margin-bottom: 30px;
+    font-size: 50px;
     font-weight: bold;
+    text-align: center;
+}
+
+.content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+.left-panel, .right-panel {
+    flex: 1;
+    min-width: 300px;
+}
+
+.left-panel {
+    max-width: 400px;
+}
+
+.selector-container {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.selector-container label {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    display: block;
+    margin-bottom: 10px;
 }
 
 select {
     padding: 10px;
-    margin-bottom: 20px;
     border-radius: 6px;
-    border: 1px solid #ccc;
+    border: 2px solid #4a5568;
     font-size: 16px;
     width: 100%;
+    background-color: #1a202c;
+    color: #f1f1f1;
+    margin-bottom: 20px;
 }
 
 button {
-    background-color: #3498db;
+    background-color: #023abf;
     color: white;
     padding: 12px 25px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: #4299e1;
     transform: translateY(-2px);
 }
 
+.image-container {
+    background-color: #1a202c;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    margin-top: 30px;
+    text-align: left;
+}
+
+.image-container h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.image-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    border: 3px solid #ffffff;
+}
+
 .result-container {
-    margin-top: 25px;
+    background-color: #121823;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    color: #e2e8f0;
     text-align: left;
 }
 
 .result-container h2 {
-    color: #2d3436;
-    font-size: 22px;
-    margin-bottom: 10px;
+    color: #ffffff;
+    font-size: 24px;
+    margin-bottom: 15px;
 }
 
-.result-container h3 {
-    color: #555;
-    font-size: 18px;
-    margin-bottom: 10px;
-}
-
-.result-container ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.result-container li {
-    background: #ecf0f1;
-    margin: 8px 0;
-    padding: 12px;
-    border-radius: 6px;
-    font-size: 16px;
-    color: #2c3e50;
+.ld50-cards {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 10px;
-    transition: background-color 0.3s ease;
 }
 
-.result-container li:hover {
-    background-color: #d5dbdb;
+.ld50-card {
+    background-color: #1a202c;
+    border: 2px solid #4a5568;
+    border-radius: 6px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    margin-bottom: 5px; 
+}
+
+.ld50-card p {
+    font-size: 18px;
+    color: #f1f1f1;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+    }
 }
