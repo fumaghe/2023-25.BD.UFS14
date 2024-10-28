@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LD50 di Acetic Acid</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div class="container">
+        <h1>LD50 di Acetic Acid</h1>
+        <button onclick="fetchLD50()">Ottieni LD50</button>
+        <div class="result-container" id="result-container"></div>
+    </div>
+
+    <script>
+        function fetchLD50() {
+            fetch("http://127.0.0.1:7071/api/get_ld50_acetic_acid")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const container = document.getElementById("result-container");
+                    container.innerHTML = `<h2>Ingrediente: ${data.ingredient}</h2>`;
+                    container.innerHTML += "<h3>Valori LD50:</h3><ul>";
+                    data.ld50_values.forEach(value => {
+                        container.innerHTML += `<li>${value}</li>`;
+                    });
+                    container.innerHTML += "</ul>";
+                })
+                .catch(error => {
+                    console.error("Errore nel recupero dei dati:", error);
+                    document.getElementById("result-container").innerHTML = "<p>Errore nel recupero dei dati</p>";
+                });
+        }
+    </script>
+</body>
+</html>
