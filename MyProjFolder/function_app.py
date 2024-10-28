@@ -2,12 +2,14 @@ import azure.functions as func
 import json
 import logging
 import requests
+import urllib.parse
 
 app = func.FunctionApp()
 
 # Function to get the CID of an ingredient from PubChem
 def get_pubchem_cid(session, ingredient_name):
-    url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{ingredient_name}/cids/JSON"
+    encoded_name = urllib.parse.quote(ingredient_name)
+    url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{encoded_name}/cids/JSON"
     try:
         response = session.get(url)
         response.raise_for_status()
@@ -43,15 +45,20 @@ def get_ld50_pubchem(session, cid):
         logging.error(f"Error retrieving LD50 from PubChem for CID {cid}: {e}")
         return None
 
-@app.route(route="get_ld50_acetic_acid", auth_level=func.AuthLevel.ANONYMOUS)
-def get_ld50_acetic_acid(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Processing HTTP request for LD50 values of Acetic Acid.')
+@app.route(route="get_ld50", auth_level=func.AuthLevel.ANONYMOUS)
+def get_ld50(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Processing HTTP request for LD50 values of an ingredient.')
 
-    # Fixed ingredient name
-    ingredient_name = "Acetic Acid"
+    ingredient_name = req.params.get('ingredient_name')
+
+    if not ingredient_name:
+        return func.HttpResponse(
+            "Please pass an ingredient_name in the query string.",
+            status_code=400
+        )
 
     with requests.Session() as session:
-        # Get the CID for Acetic Acid
+        # Get the CID for the ingredient
         cid = get_pubchem_cid(session, ingredient_name)
         if cid:
             # Get the LD50 values using the CID

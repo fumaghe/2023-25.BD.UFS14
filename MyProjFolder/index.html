@@ -3,20 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LD50 di Acetic Acid</title>
+    <title>LD50 degli Ingredienti</title>
     <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
     <div class="container">
-        <h1>LD50 di Acetic Acid</h1>
+        <h1>LD50 degli Ingredienti</h1>
+        <select id="ingredient-select">
+            <option value="">Seleziona un ingrediente</option>
+        </select>
         <button onclick="fetchLD50()">Ottieni LD50</button>
         <div class="result-container" id="result-container"></div>
     </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('ingredient_names.csv')
+                .then(response => response.text())
+                .then(data => {
+                    const lines = data.split('\n').slice(1); // Salta l'intestazione
+                    const ingredientNames = lines.map(line => line.trim()).filter(line => line);
+                    const select = document.getElementById("ingredient-select");
+                    ingredientNames.forEach(name => {
+                        const option = document.createElement("option");
+                        option.value = name;
+                        option.text = name;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error("Errore nel caricamento dei nomi degli ingredienti:", error);
+                });
+        });
+
         function fetchLD50() {
-            fetch("http://127.0.0.1:7071/api/get_ld50_acetic_acid")
+            const ingredientName = document.getElementById("ingredient-select").value;
+            if (!ingredientName) {
+                alert("Per favore, seleziona un ingrediente.");
+                return;
+            }
+
+            fetch(`http://127.0.0.1:7071/api/get_ld50?ingredient_name=${encodeURIComponent(ingredientName)}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
@@ -34,7 +61,7 @@
                 })
                 .catch(error => {
                     console.error("Errore nel recupero dei dati:", error);
-                    document.getElementById("result-container").innerHTML = "<p>Errore nel recupero dei dati</p>";
+                    document.getElementById("result-container").innerHTML = `<p>Errore nel recupero dei dati: ${error.message}</p>`;
                 });
         }
     </script>
