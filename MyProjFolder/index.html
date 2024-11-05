@@ -5,58 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LD50 degli Ingredienti</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;700&display=swap">
+    <!-- Link a Font Awesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-dFmB3+jftUW0sC+xQG+dLkF4kD4rYTxzKqub3CwKG2Cv6B1Q8EdDzQ9S1d9rjsBT2Jdg92P3iQz0LJX5ZSvCkg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>LD50 degli Ingredienti</h1>
-        <div class="content">
-            <div class="left-panel">
-                <div class="selector-container">
-                    <label for="ingredient-select">Seleziona un ingrediente</label>
-                    <select id="ingredient-select">
-                        <option value="">Scegli un ingrediente</option>
-                    </select>
-                    <button onclick="fetchData()">Ottieni Informazioni</button>
-                </div>
-                <div class="image-container" id="image-container">
-                    <!-- L'immagine della struttura verrà inserita qui -->
-                </div>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">ToxApp</div>
+    </nav>
+
+    <!-- Sidebar Fissa -->
+    <aside class="sidebar">
+        <!-- Campo di Ricerca -->
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="Cerca un ingrediente..." oninput="handleSearch()" autocomplete="off">
+            <div class="search-suggestions" id="search-suggestions">
+                <!-- Suggerimenti di ricerca verranno inseriti qui -->
             </div>
-            <div class="right-panel">
-                <div class="result-container" id="result-container">
-                    <!-- I valori LD50 verranno inseriti qui -->
-                </div>
+            <!-- Icona del beaker chimico -->
+            <div class="beaker-icon">
+                <i class="fas fa-flask"></i>
             </div>
         </div>
+    </aside>
+
+    <!-- Sezione Principale -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <div class="image-container" id="image-container">
+                <!-- L'immagine della struttura verrà inserita qui -->
+            </div>
+            <div class="result-container" id="result-container">
+                <!-- I valori LD50 verranno inseriti qui -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Spinner di Caricamento (Opzionale) -->
+    <div class="spinner" id="spinner" style="display: none;">
+        <i class="fas fa-spinner fa-spin"></i>
     </div>
 
+    <!-- Script JavaScript -->
     <script>
+        let allIngredients = [];
+
         document.addEventListener("DOMContentLoaded", function() {
             fetch('ingredient_names.csv')
-                .then(response => response.text())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
                 .then(data => {
+                    console.log("Dati CSV ricevuti:", data); // Debugging
                     const lines = data.split('\n').slice(1); // Salta l'intestazione
-                    const ingredientNames = lines.map(line => line.trim()).filter(line => line);
-                    const select = document.getElementById("ingredient-select");
-                    ingredientNames.forEach(name => {
-                        const option = document.createElement("option");
-                        option.value = name;
-                        option.text = name;
-                        select.appendChild(option);
-                    });
+                    allIngredients = lines.map(line => line.trim()).filter(line => line);
+                    console.log("Ingredienti caricati:", allIngredients); // Debugging
                 })
                 .catch(error => {
                     console.error("Errore nel caricamento dei nomi degli ingredienti:", error);
+                    document.getElementById("search-suggestions").innerHTML = `<p>Errore nel caricamento degli ingredienti.</p>`;
                 });
         });
 
-        function fetchData() {
-            const ingredientName = document.getElementById("ingredient-select").value;
+        // Gestisce la ricerca dinamica
+        function handleSearch() {
+            const query = document.getElementById("search-input").value.toLowerCase();
+            const suggestions = allIngredients.filter(name => name.toLowerCase().includes(query)).slice(0, 5);
+            displaySuggestions(suggestions);
+        }
+
+        // Visualizza i suggerimenti di ricerca
+        function displaySuggestions(suggestions) {
+            const suggestionsContainer = document.getElementById("search-suggestions");
+            suggestionsContainer.innerHTML = '';
+            suggestions.forEach(name => {
+                const suggestion = document.createElement("div");
+                suggestion.className = "suggestion-square";
+                suggestion.textContent = name;
+                suggestion.onclick = () => {
+                    document.getElementById("search-input").value = name;
+                    suggestionsContainer.innerHTML = '';
+                    fetchData(name);
+                };
+                suggestionsContainer.appendChild(suggestion);
+            });
+        }
+
+        // Funzione per recuperare e visualizzare i dati
+        function fetchData(ingredientName) {
             if (!ingredientName) {
                 alert("Per favore, seleziona un ingrediente.");
                 return;
             }
+
+            // Mostra lo spinner
+            document.getElementById("spinner").style.display = "block";
 
             fetch(`http://127.0.0.1:7071/api/get_ld50_and_image?ingredient_name=${encodeURIComponent(ingredientName)}`)
                 .then(response => {
@@ -66,6 +113,9 @@
                     return response.json();
                 })
                 .then(data => {
+                    // Nascondi lo spinner
+                    document.getElementById("spinner").style.display = "none";
+
                     // Visualizza l'immagine
                     const imageContainer = document.getElementById("image-container");
                     imageContainer.innerHTML = `<h2>Struttura di ${data.ingredient}:</h2>`;
@@ -89,6 +139,9 @@
                     }
                 })
                 .catch(error => {
+                    // Nascondi lo spinner
+                    document.getElementById("spinner").style.display = "none";
+
                     console.error("Errore nel recupero dei dati:", error);
                     document.getElementById("result-container").innerHTML = `<p>Errore nel recupero dei dati: ${error.message}</p>`;
                 });
