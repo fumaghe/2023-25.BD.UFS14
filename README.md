@@ -14,7 +14,7 @@ Questo progetto descrive lo sviluppo di un'applicazione su Azure utilizzando Azu
 Accedere ad Azure con il comando seguente:
 az login --use-device-code
 
-Creazione di Variabili d'Ambiente
+# Creazione di Variabili d'Ambiente
 ## Impostare alcune variabili d'ambiente necessarie per il progetto:
 export AZURE_RESOURCE_GROUP=`az group list | jq -r ".[].name"`
 echo "Il tuo AZURE_RESOURCE_GROUP e' il seguente ${AZURE_RESOURCE_GROUP}"
