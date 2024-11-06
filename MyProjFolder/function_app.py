@@ -51,18 +51,8 @@ def get_structure_image_url(cid):
     image_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/CID/{cid}/PNG"
     return image_url
 
-@app.route(route="get_ld50_and_image", auth_level=func.AuthLevel.ANONYMOUS)
-def get_ld50_and_image(req: func.HttpRequest) -> func.HttpResponse:
-    logging.info('Processing HTTP request for LD50 values and structure image of an ingredient.')
-
-    ingredient_name = req.params.get('ingredient_name')
-
-    if not ingredient_name:
-        return func.HttpResponse(
-            "Please pass an ingredient_name in the query string.",
-            status_code=400
-        )
-
+# Helper function to process the LD50 and image retrieval
+def process_ld50_and_image(ingredient_name):
     with requests.Session() as session:
         # Get the CID for the ingredient
         cid = get_pubchem_cid(session, ingredient_name)
@@ -86,3 +76,36 @@ def get_ld50_and_image(req: func.HttpRequest) -> func.HttpResponse:
                 f"CID not found for '{ingredient_name}'.",
                 status_code=404
             )
+
+# Existing function remains unchanged
+@app.route(route="get_ld50_and_image", auth_level=func.AuthLevel.ANONYMOUS)
+def get_ld50_and_image(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Processing HTTP request for LD50 values and structure image of an ingredient.')
+
+    ingredient_name = req.params.get('ingredient_name')
+
+    if not ingredient_name:
+        return func.HttpResponse(
+            "Please pass an ingredient_name in the query string.",
+            status_code=400
+        )
+
+    return process_ld50_and_image(ingredient_name)
+
+# New function to handle any ingredient name from the URL path
+@app.route(route="{ingredient_name}", auth_level=func.AuthLevel.ANONYMOUS)
+def get_ld50_and_image_by_route(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Processing HTTP request from URL path for LD50 values and structure image of an ingredient.')
+
+    encoded_ingredient_name = req.route_params.get('ingredient_name')
+
+    if not encoded_ingredient_name:
+        return func.HttpResponse(
+            "Please provide an ingredient name in the URL path.",
+            status_code=400
+        )
+
+    # Decode the URL-encoded ingredient name
+    ingredient_name = urllib.parse.unquote(encoded_ingredient_name)
+
+    return process_ld50_and_image(ingredient_name)
