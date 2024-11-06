@@ -124,30 +124,27 @@ body {
     flex-wrap: wrap; /* Per gestire il wrapping su schermi piccoli */
 }
 
-
-.image-container h2, .result-container h2 {
-    font-size: 24px;
-    margin-bottom: 10px;
-    color: #000000; /* Nero */
-}
-
-.image-container {
-    background-color: #ffffff; /* White */
+.image-container, .result-container {
+    background-color: #ffffff; /* Bianco puro */
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* Light shadow */
-    display: inline-block;
-    text-align: center;
-    max-width: fit-content; /* Automatically adjust to content size */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* Ombra molto leggera */
+    flex: 1;
+    min-width: 300px; /* Assicura una minima larghezza */
+}
+
+.image-container h2, .result-container h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #000000; /* Nero */
 }
 
 .image-container img {
     max-width: 100%;
     height: auto;
     border-radius: 6px;
-    border: 3px solid #d1d5db; /* Light gray border */
+    border: 3px solid #d1d5db; /* Grigio chiaro */
 }
-
 
 .result-container {
     color: #4b5563; /* Grigio medio */
@@ -175,7 +172,7 @@ body {
 }
 
 .ld50-card p {
-    font-size: 10px;
+    font-size: 18px;
     color: #333333; /* Grigio scuro */
     margin: 0;
 }
@@ -257,11 +254,11 @@ body {
     }
 
     .result-container h2 {
-        font-size: 24px;
+        font-size: 20px;
     }
 
     .ld50-card p {
-        font-size: 10px;
+        font-size: 16px;
     }
 }
 
@@ -301,7 +298,7 @@ body {
     }
 
     .ld50-card p {
-        font-size: 10px;
+        font-size: 14px;
     }
 
     .content-wrapper {
